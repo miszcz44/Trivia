@@ -1,0 +1,8 @@
+Pytania z opcją wyboru 1 z 4 odpowiedzi abcd, walidacja wprowadzenia danych użytkownika
+Pytanie losowo pobierane z plików z rozszerzeniem json, uniemożliwić powtarzanie pytania
+W razie nieprawidłowej odpowiedzi wyświetla się prawidłowa
+Wstępnie 10 pytań, na końcu programu wyświetlany wynik
+Podział na kategorie, wstępnie 5, za każdym razem użytkownika może kategorię wybrać
+Dla każdej kategorii osobny plik
+Możliwość skorzystania z 2 kół ratunkowych - pół na pół i odrzuć jedno z dwóch
+Zapisywanie 5 najlepszych wyników do pliku
