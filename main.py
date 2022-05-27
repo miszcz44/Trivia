@@ -2,7 +2,7 @@ import json
 import random
 
 points = 0
-lifelines = {1: "fifty-fifty", 2: "reject one of two"}
+lifelines = {"1": "fifty-fifty", "2": "reject one of two"}
 used_lifelines = []
 
 
@@ -23,49 +23,38 @@ def Print_user_possibilities(category, question_numb, list_of_possible_answers):
             print(str(lifeline) + ". " + lifelines[lifeline])
 
 def Fifty_fifty(category, question_numb, list_of_possible_answers):
- #   Update_lifelines("fifty-fifty")
     Remove_two_wrong_answers(category, question_numb, list_of_possible_answers)
     return Print_question_and_possibilities_and_get_the_answer(category, question_numb, list_of_possible_answers)
 
-#def Update_lifelines(lifeline_type):
- #   for lifeline in lifelines:
-  #      if lifelines[lifeline] == lifeline_type:
- #           temporary_lifeline_number = lifeline
- #           lifelines.pop(lifeline)
- #   for lifeline in lifelines:
- #       if(lifeline > temporary_lifeline_number):
-#            lifeline -= 1
-
-def Remove_two_wrong_answers(category, question_numb, list_of_possible_answers):
-    list_of_possible_answers.remove(category[question_numb]["correct_answer"])
-    wrong_answer = random.choice(list_of_possible_answers)
-    #print(wrong_answer)
-    list_of_possible_answers = [category[question_numb]["correct_answer"], wrong_answer]
-    list_of_possible_answers.sort()
+def Remove_two_wrong_answers(category, question_numb, list_of_possible_answers_after_fifty_fifty):
+    list_of_possible_answers_after_fifty_fifty.remove(category[question_numb]["correct_answer"])
+    wrong_answer = random.choice(list_of_possible_answers_after_fifty_fifty)
+    list_of_possible_answers_after_fifty_fifty = [category[question_numb]["correct_answer"], wrong_answer]
+    list_of_possible_answers_after_fifty_fifty.sort()
+    return list_of_possible_answers_after_fifty_fifty
 
 def Update_lifelines():
     for _ in range(len(used_lifelines)):
-        for key, value in lifelines:
+        for key, value in lifelines.items():
             if(value == used_lifelines[0]):
-                lifelines.pop(key)
+                temp_key = key
+        lifelines.pop(temp_key)
 
 
 def Answering_mechanism(category):
     global points
     global questions_count
     global used_lifelines
-    list_of_possible_answers = ['a','b','c','d']
+    list_of_possible_answers = ['a', 'b', 'c', 'd']
     questions_count += 1
-    question_number = random.randint(0,len(category)-1)
+    question_number = random.randint(0, len(category)-1)
     user_answer = Print_question_and_possibilities_and_get_the_answer(category, question_number, list_of_possible_answers)
-    print(user_answer)
     if(user_answer == "1"):
-        print("abcd")
         used_lifelines.append("fifty-fifty")
-        Fifty_fifty(category, question_number, list_of_possible_answers)
-        print(list_of_possible_answers)
-    while(user_answer not in list_of_possible_answers and user_answer not in lifelines.keys()):
-        if(len(lifelines) > 0): print("Choose one of possible answers or take a lifeline. Try again")
+        list_of_possible_answers = Remove_two_wrong_answers(category, question_number, list_of_possible_answers)
+        user_answer = Print_question_and_possibilities_and_get_the_answer(category, question_number, list_of_possible_answers)
+    while(user_answer not in list_of_possible_answers and (user_answer not in lifelines.keys() or len(used_lifelines) > 0)):
+        if(len(lifelines) > 0 and len(used_lifelines) == 0): print("Choose one of possible answers or take a lifeline. Try again")
         else: print("Choose one of possible answers. Try again")
         user_answer = Print_question_and_possibilities_and_get_the_answer(category, question_number, list_of_possible_answers)
     if(user_answer == category[question_number]["correct_answer"]):
@@ -73,7 +62,7 @@ def Answering_mechanism(category):
         points += 1
     else:
         print("Wrong answer, the correct answer is " + category[question_number]["correct_answer"])
-    print("Twoje punkty: " + str(points) + "/" + str(questions_count))
+    print("Your score: " + str(points) + "/" + str(questions_count))
     category.remove(category[question_number])
     Update_lifelines()
     used_lifelines = []
@@ -100,4 +89,4 @@ while(questions_count != 10):
     elif(user_category_choice == 4): category = biology_questions
     elif(user_category_choice == 5): category = chemistry_questions
     Answering_mechanism(category)
-print("Rozgrywka zakończona, twoje punkty: " + str(points) + "/" + str(questions_count))
+print("The game is over, your score: " + str(points) + "/" + str(questions_count))
