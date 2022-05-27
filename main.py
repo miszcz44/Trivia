@@ -4,6 +4,7 @@ import random
 points = 0
 lifelines = {"1": "fifty-fifty", "2": "reject-one-of-two"}
 used_lifelines = []
+category_numbers = ["1", "2", "3", "4", "5"]
 
 
 
@@ -37,7 +38,7 @@ def Update_lifelines():
     flag = 0
     for _ in range(len(lifelines)):
         for key, value in lifelines.items():
-            if(value == used_lifelines[0]):
+            if(value in used_lifelines):
                 temp_key = key
                 flag = 1
                 break
@@ -102,10 +103,54 @@ def Answering_mechanism():
         points += 1
     else:
         print("Wrong answer, the correct answer is " + category[question_number]["correct_answer"])
-    print("Your score: " + str(points) + "/" + str(questions_count))
+    if(questions_count < 10):
+        print("Your score: " + str(points) + "/" + str(questions_count))
     category.remove(category[question_number])
     Update_lifelines()
     used_lifelines = []
+
+def Load_best_results_from_file():
+    print("Best results:")
+    place = 1
+    with open("BestResults") as best_results_file:
+        for line in best_results_file:
+            line = line.strip()
+            print(str(place) + "." + line + "/10")
+            place += 1
+    print()
+    best_results_file.close()
+
+def Save_best_results():
+    best_results = Get_best_results()
+    best_results = Update_best_results(best_results)
+    with open("BestResults", "w") as best_results_file:
+        for el in best_results:
+            best_results_file.write(str(el) + "\n")
+    best_results_file.close()
+
+def Get_best_results():
+    best_results = []
+    with open("BestResults") as best_results_file:
+        for line in best_results_file:
+            best_results.append(int(line))
+    best_results_file.close()
+    return best_results
+
+def Update_best_results(best_results):
+    flag = 0
+    for i in range(len(best_results)):
+        if (points >= best_results[i]):
+            position_for_result = i
+            flag = 1
+            break
+    if(flag == 1):
+        best_results.insert(position_for_result, points)
+    elif(flag == 0 and len(best_results) < 5):
+        best_results.append(points)
+    if(len(best_results) > 5):
+        best_results.remove(best_results[-1])
+    return best_results
+
 
 with open("TriviaSport.json") as json_file:
     sport_questions = json.load(json_file)
@@ -121,12 +166,27 @@ with open("TriviaChemistry.json") as json_file:
 category = ''
 questions_count = 0
 while(questions_count != 10):
-    print("Choose Category:\n1.Sport\n2.Geography\n3.History\n4.Biology\n5.Chemistry")
-    user_category_choice = int(input())
-    if(user_category_choice == 1): category = sport_questions
-    elif(user_category_choice == 2): category = geography_questions
-    elif(user_category_choice == 3): category = history_questions
-    elif(user_category_choice == 4): category = biology_questions
-    elif(user_category_choice == 5): category = chemistry_questions
-    Answering_mechanism()
-print("The game is over, your score: " + str(points) + "/" + str(questions_count))
+    print("1.Start\n2.Best results\n3.Quit")
+    user_choice = int(input())
+    while(user_choice != 1 and user_choice != 2 and user_choice != 3):
+        print("Choose one of possible options. Try again")
+        user_choice = int(input())
+    if(user_choice == 3): break
+    elif(user_choice == 2):
+        Load_best_results_from_file()
+        continue
+    else:
+        while(questions_count != 10):
+            print("Choose Category:\n1.Sport\n2.Geography\n3.History\n4.Biology\n5.Chemistry")
+            user_category_choice = input()
+            while(user_category_choice not in category_numbers):
+                print("Choose one of possible options. Try again")
+                user_category_choice = input()
+            if(int(user_category_choice) == 1): category = sport_questions
+            elif(int(user_category_choice) == 2): category = geography_questions
+            elif(int(user_category_choice) == 3): category = history_questions
+            elif(int(user_category_choice) == 4): category = biology_questions
+            elif(int(user_category_choice) == 5): category = chemistry_questions
+            Answering_mechanism()
+    Save_best_results()
+    print("The game is over, your score: " + str(points) + "/" + str(questions_count))
